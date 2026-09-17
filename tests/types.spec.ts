@@ -47,6 +47,8 @@ test("Login with problem user", async ({ page }) => {
   await page.locator("input#user-name").fill(username);
   await page.locator("//input[@id='password']").fill(password);
 
+  // await se usa para esperar a que se complete la promesa (la accion) y la resuelva
+  // await la pagina espera el selector (getByRole) y cuando este disponible, luego hace click (.click()) en el boton de login
   await page.getByRole("button", { name: "Login" }).click();
 });
 
@@ -67,3 +69,12 @@ test("Login with locked out user", async ({ page }) => {
 
   expect(result, 'Expected error message found = true').toBeTruthy();
 });
+
+// Errores comundes de typeScript
+// Declaracion de type incorrecto
+const name: string = "John Doe"; // Correcto
+// const name3: number = "John Doe"; // Incorrecto, Type 'string' is not assignable to type 'number'.
+
+// Import incorrecto de un modulo
+// import { User } from "./data/usuarios"; // Correcto
+// import { User } from "./data/usuarios.ts"; // Incorrecto, Module '"./data/usuarios.ts"' has no exported member 'User'.
