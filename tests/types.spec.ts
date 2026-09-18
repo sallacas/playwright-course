@@ -78,3 +78,6 @@ const name: string = "John Doe"; // Correcto
 // Import incorrecto de un modulo
 // import { User } from "./data/usuarios"; // Correcto
 // import { User } from "./data/usuarios.ts"; // Incorrecto, Module '"./data/usuarios.ts"' has no exported member 'User'.
+
+// Resolver una promesa sin await
+// const result: boolean = validateError(page); // Incorrecto, Type 'Promise<boolean>' is not assignable to type 'boolean'.
