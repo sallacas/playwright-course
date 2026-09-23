@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { User, usuarios } from "./data/usuarios";
+import { User, usuarios } from "../data/usuarios";
 
 // Traer los usuarios desde el archivo data/usuarios.ts
 
