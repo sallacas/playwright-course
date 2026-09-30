@@ -43,6 +43,7 @@ export default defineConfig({
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      timeout: 60000, // Timeout de 60 segundos para pruebas en Firefox
     },
 
     {
