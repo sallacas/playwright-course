@@ -1,14 +1,14 @@
 import { type Locator, type Page, expect } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
-export class LoginPage {
+export class LoginPage extends BasePage {
     // Definimos los elementos de la página en variables
-    readonly page: Page;
     readonly usernameInput: Locator;
     readonly passwordInput: Locator;
     readonly loginButton: Locator;
     // Definimos el constructor de la clase
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         // Inicializamos los elementos de la página
         this.usernameInput = this.page.getByPlaceholder("Username");
         this.passwordInput = this.page.getByPlaceholder("Password");
@@ -23,10 +23,5 @@ export class LoginPage {
         await this.usernameInput.fill(username);
         await this.passwordInput.fill('secret_sauce');
         await this.loginButton.click();
-    }
-    async validarIngresoExitoso(): Promise<void> {
-        await this.page.waitForURL("https://www.saucedemo.com/inventory.html");
-        await expect(this.page.locator('span[data-test="title"]')).toBeVisible();
-        await expect(this.page.locator('span[data-test="title"]')).toHaveText("Products");
     }
 }

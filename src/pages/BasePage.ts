@@ -1,0 +1,21 @@
+import { type Locator, type Page, expect } from "@playwright/test";
+
+export class BasePage {
+  readonly page: Page;
+  readonly listItems: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.listItems = this.page.locator("div[data-test='inventory-item']");
+  }
+  async validarItemsEnCarrito(cantidad: number): Promise<void> {
+    await expect(this.listItems).toHaveCount(cantidad);
+  }
+  async validarIngresoExitoso(): Promise<void> {
+    await this.page.waitForURL("https://www.saucedemo.com/inventory.html");
+    await expect(this.page.locator('span[data-test="title"]')).toBeVisible();
+    await expect(this.page.locator('span[data-test="title"]')).toHaveText(
+      "Products",
+    );
+  }
+}
