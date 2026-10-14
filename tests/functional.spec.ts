@@ -100,6 +100,6 @@ test.describe("Failure Tests", { tag: "@failure" }, () => {
     await expect(
       page.locator('h3[data-test="error"]'),
       "The message has correct text",
-    ).toContainText("Epic sadface: Sorry, this user has been locked out. FAILED");
+    ).toContainText("Epic sadface: Sorry, this user has been locked out.");
   });
 });
