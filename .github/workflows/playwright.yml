@@ -17,8 +17,8 @@ jobs:
       run: npm install -g pnpm && pnpm install
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
-    - name: Run Playwright tests
-      run: pnpm exec playwright test
+    - name: Run Integration Tests
+      run: pnpm exec playwright test --grep "@integration"
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

@@ -16,7 +16,7 @@ export class LoginPage extends BasePage {
     }
 
     async abrirPagina(): Promise<void> {
-        await this.page.goto("https://www.saucedemo.com/");
+        await this.page.goto("");
     }
 
     async ingresar(username: string): Promise<void> {
