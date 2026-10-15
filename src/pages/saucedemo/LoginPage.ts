@@ -1,5 +1,5 @@
 import { type Locator, type Page, expect } from "@playwright/test";
-import { BasePage } from "./BasePage";
+import { BasePage } from "../BasePage";
 
 export class LoginPage extends BasePage {
     // Definimos los elementos de la página en variables
