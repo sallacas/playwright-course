@@ -1,5 +1,5 @@
 import { type Page, type Locator, expect } from "@playwright/test";
-import { BasePage } from "./BasePage";
+import { BasePage } from "../BasePage";
 
 export class CheckoutCompletePage extends BasePage {
     readonly completeHeader: Locator;

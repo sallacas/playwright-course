@@ -18,4 +18,11 @@ export class BasePage {
       "Products",
     );
   }
+  async validarUrl(urlEsperada: string): Promise<void> {
+    await this.page.waitForURL(urlEsperada);
+    await expect(this.page).toHaveURL(urlEsperada);
+  }
+  async abrirPagina(url: string): Promise<void> {
+    await this.page.goto(url);
+  }
 }

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "../src/pages/LoginPage";
-import { InventoryPage } from "../src/pages/InventoryPage";
+import { LoginPage } from "../src/pages/saucedemo/LoginPage";
+import { InventoryPage } from "../src/pages/saucedemo/InventoryPage";
 
 test("Login to sauce demo", async ({ page }) => {
   // Crear nuestro PageObject

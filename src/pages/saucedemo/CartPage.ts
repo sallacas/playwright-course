@@ -1,5 +1,5 @@
 import { type Page, type Locator } from "@playwright/test";
-import { BasePage } from "./BasePage";
+import { BasePage } from "../BasePage";
 
 export class CartPage extends BasePage {
   readonly checkoutButton: Locator;
