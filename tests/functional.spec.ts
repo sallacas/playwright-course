@@ -1,60 +1,74 @@
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../src/pages/LoginPage";
-import { InventoryPage } from "../src/pages/InventoryPage";
-import { CartPage } from "../src/pages/CartPage";
-import { CheckoutPage } from "../src/pages/CheckoutPage";
-import { OverviewPage } from "../src/pages/OverviewPage";
-import { CheckoutCompletePage } from "../src/pages/CheckoutComplete";
-import { compra_exitosa } from "../src/data/usuarios";
+import { test, expect } from "../src/config";
+import { compra_exitosa, compra_exitosa_multiple } from "../src/data/usuarios";
 
-test.beforeEach(async ({ page }) => {
-  const loginPage = new LoginPage(page);
-
-  await loginPage.abrirPagina();
-  await loginPage.ingresar("standard_user");
-  await loginPage.validarIngresoExitoso();
-});
-
-test.describe("Integration Tests", { tag: "@integration" }, () => {
-  test("Compra exitosa de múltiples productos", { tag: "@smoke" },async ({ page }) => {
-    const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
-    const overviewPage = new OverviewPage(page);
-    const checkoutCompletePage = new CheckoutCompletePage(page);
-    // Datos de prueba - importamos el objeto
-    const { item, firstName, lastName, zipCode } = compra_exitosa;
-    
-    await inventoryPage.agregarItemPorNombre(item);
-    await inventoryPage.agregarPrimerItemAlCarrito();
-    await inventoryPage.agregarItemCarrito(2);
-    await inventoryPage.agregarUltimoItemAlCarrito();
-
-    await inventoryPage.validarItemsAgregadosAlCarrito(4);
-    await inventoryPage.abrirCarrito();
-
-    // CartPage
-    await cartPage.validarItemsEnCarrito(4);
-    await cartPage.irAlCheckout();
-
-    // CheckoutPage
-    await checkoutPage.rellenarFormularioCheckout(firstName, lastName, zipCode);
-    await checkoutPage.continuarCheckout();
-
-    // OverviewPage
-    await overviewPage.validarItemsEnCarrito(4);
-    await overviewPage.finalizarCompra();
-
-    // Validar que la compra fue exitosa
-    await checkoutCompletePage.validarCheckoutCompleto();
-    await checkoutCompletePage.volverAlInicio();
-    await checkoutCompletePage.validarIngresoExitoso();
+test.describe("Compra y Carrito", { tag: "@integration" }, () => {
+  test.beforeEach(async ({ loginPage }) => {
+    await loginPage.abrirPagina();
+    await loginPage.ingresar("standard_user");
+    await loginPage.validarIngresoExitoso();
   });
+  test(
+    "Compra exitosa de un producto",
+    { tag: "@smoke" },
+    async ({
+      inventoryPage,
+      cartPage,
+      checkoutPage,
+      overviewPage,
+      checkoutCompletePage,
+    }) => {
+      const { item, firstName, lastName, zipCode } = compra_exitosa;
+      test.step(`Agregar el item al carrito y abrir el carrito`, async () => {
+        await inventoryPage.agregarItemPorNombre(item);
+        await inventoryPage.validarItemsAgregadosAlCarrito(1);
+        await inventoryPage.abrirCarrito();
+      });
 
-  test("Modificación del carrito antes de comprar", async ({ page }) => {
-    const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
+      // CartPage
+      await cartPage.validarUrl("https://www.saucedemo.com/cart.html");
+      test.step("Validar items en carrito y proceder al checkout", async () => {
+        await cartPage.validarItemsEnCarrito(1);
+        await cartPage.irAlCheckout();
+      });
 
+      // CheckoutPage
+      await checkoutPage.validarUrl(
+        "https://www.saucedemo.com/checkout-step-one.html",
+      );
+      test.step("Rellenar formulario de checkout y continuar", async () => {
+        console.log("Datos de prueba:", { firstName, lastName, zipCode });
+        await checkoutPage.rellenarFormularioCheckout(
+          firstName,
+          lastName,
+          zipCode,
+        );
+        await checkoutPage.continuarCheckout();
+      });
+
+      // OverviewPage
+      await overviewPage.validarUrl(
+        "https://www.saucedemo.com/checkout-step-two.html",
+      );
+      test.step("Validar items en overview y finalizar compra", async () => {
+        await overviewPage.validarItemsEnCarrito(1);
+        await overviewPage.finalizarCompra();
+      });
+
+      // Validar que la compra fue exitosa
+      await checkoutCompletePage.validarUrl(
+        "https://www.saucedemo.com/checkout-complete.html",
+      );
+      test.step("Validar checkout completo y volver al inicio", async () => {
+        await checkoutCompletePage.validarCheckoutCompleto();
+        await checkoutCompletePage.volverAlInicio();
+        await checkoutCompletePage.validarIngresoExitoso();
+      });
+    },
+  );
+  test("Eliminar un producto del carrito", async ({
+    inventoryPage,
+    cartPage,
+  }) => {
     await inventoryPage.agregarItemPorNombre("Sauce Labs Bike Light");
     await inventoryPage.agregarPrimerItemAlCarrito();
     await inventoryPage.validarItemsAgregadosAlCarrito(2);
@@ -68,14 +82,11 @@ test.describe("Integration Tests", { tag: "@integration" }, () => {
     await inventoryPage.abrirCarrito();
     await cartPage.validarItemsEnCarrito(1);
   });
-
   test("Validación de campos obligatorios durante checkout", async ({
-    page,
+    inventoryPage,
+    cartPage,
+    checkoutPage,
   }) => {
-    const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
-
     await inventoryPage.agregarItemYIrAlCarrito();
     await cartPage.irAlCheckout();
     // Dando a continuar sin hacer el formulario
@@ -83,22 +94,80 @@ test.describe("Integration Tests", { tag: "@integration" }, () => {
     // Validar que se muestra el mensaje de error
     await checkoutPage.validarMensajeError();
   });
+  test(
+    "Compra exitosa de múltiples productos",
+    { tag: "@smoke" },
+    async ({
+      inventoryPage,
+      cartPage,
+      checkoutPage,
+      overviewPage,
+      checkoutCompletePage,
+    }) => {
+      const { items, firstName, lastName, zipCode } = compra_exitosa_multiple;
+      test.step(`Agregar ${items.length} items al carrito y abrir el carrito`, async () => {
+        for (const item of items) {
+          await inventoryPage.agregarItemPorNombre(item);
+        }
+        await inventoryPage.validarItemsAgregadosAlCarrito(items.length);
+        await inventoryPage.abrirCarrito();
+      });
+      // CartPage
+      await cartPage.validarUrl("https://www.saucedemo.com/cart.html");
+      test.step("Validar items en carrito y proceder al checkout", async () => {
+        await cartPage.validarItemsEnCarrito(items.length);
+        await cartPage.irAlCheckout();
+      });
+
+      // CheckoutPage
+      await checkoutPage.validarUrl(
+        "https://www.saucedemo.com/checkout-step-one.html",
+      );
+      test.step("Rellenar formulario de checkout y continuar", async () => {
+        console.log("Datos de prueba:", { firstName, lastName, zipCode });
+        await checkoutPage.rellenarFormularioCheckout(
+          firstName,
+          lastName,
+          zipCode,
+        );
+        await checkoutPage.continuarCheckout();
+      });
+
+      // OverviewPage
+      await overviewPage.validarUrl(
+        "https://www.saucedemo.com/checkout-step-two.html",
+      );
+      test.step("Validar items en overview y finalizar compra", async () => {
+        await overviewPage.validarItemsEnCarrito(items.length);
+        await overviewPage.finalizarCompra();
+      });
+
+      // Validar que la compra fue exitosa
+      await checkoutCompletePage.validarUrl(
+        "https://www.saucedemo.com/checkout-complete.html",
+      );
+      test.step("Validar checkout completo y volver al inicio", async () => {
+        await checkoutCompletePage.validarCheckoutCompleto();
+        await checkoutCompletePage.volverAlInicio();
+        await checkoutCompletePage.validarIngresoExitoso();
+      });
+    },
+  );
 });
 
 test.describe("Failure Tests", { tag: "@failure" }, () => {
-  test("Login to sauce demo with locked user", async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  test("Login to sauce demo with locked user", async ({ loginPage }) => {
     // Abrir la página
     await loginPage.abrirPagina();
     // Realizar el login
     await loginPage.ingresar("locked_out_user");
     // Validar los mensajes de error
     await expect(
-      page.locator('h3[data-test="error"]'),
+      loginPage.page.locator('h3[data-test="error"]'),
       "Error message is visible",
     ).toBeVisible();
     await expect(
-      page.locator('h3[data-test="error"]'),
+      loginPage.page.locator('h3[data-test="error"]'),
       "The message has correct text",
     ).toContainText("Epic sadface: Sorry, this user has been locked out.");
   });
