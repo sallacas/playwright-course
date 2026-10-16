@@ -19,7 +19,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   // Operador ternario: si estoy en CI, entonces 2 reintentos, sino 0 reintentos
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -36,7 +36,7 @@ export default defineConfig({
     viewport: { width: 1920, height: 1080 }, // Tamaño de la ventana del navegador
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
-    screenshot: 'on', // Tomar screenshot solo cuando falle el test
+    screenshot: 'only-on-failure', // Tomar screenshot solo cuando falle el test
     video: 'on', // Grabar video solo cuando falle el test
   },
 
