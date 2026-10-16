@@ -11,11 +11,11 @@ export class BasePage {
   async validarItemsEnCarrito(cantidad: number): Promise<void> {
     await expect(this.listItems).toHaveCount(cantidad);
   }
-  async validarIngresoExitoso(): Promise<void> {
+  async validarIngresoExitoso(title: string): Promise<void> {
     await this.page.waitForURL("https://www.saucedemo.com/inventory.html");
     await expect(this.page.locator('span[data-test="title"]')).toBeVisible();
     await expect(this.page.locator('span[data-test="title"]')).toHaveText(
-      "Products",
+      title,
     );
   }
   async validarUrl(urlEsperada: string): Promise<void> {

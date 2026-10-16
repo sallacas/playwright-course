@@ -5,7 +5,8 @@ test.describe("Compra y Carrito", { tag: "@integration" }, () => {
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.abrirPagina();
     await loginPage.ingresar("standard_user");
-    await loginPage.validarIngresoExitoso();
+    await loginPage.validarIngresoExitoso("Products");
+    await loginPage.validarSnapshot();
   });
   test(
     "Compra exitosa de un producto",
@@ -61,7 +62,7 @@ test.describe("Compra y Carrito", { tag: "@integration" }, () => {
       test.step("Validar checkout completo y volver al inicio", async () => {
         await checkoutCompletePage.validarCheckoutCompleto();
         await checkoutCompletePage.volverAlInicio();
-        await checkoutCompletePage.validarIngresoExitoso();
+        await checkoutCompletePage.validarIngresoExitoso("Products");
       });
     },
   );
@@ -149,7 +150,7 @@ test.describe("Compra y Carrito", { tag: "@integration" }, () => {
       test.step("Validar checkout completo y volver al inicio", async () => {
         await checkoutCompletePage.validarCheckoutCompleto();
         await checkoutCompletePage.volverAlInicio();
-        await checkoutCompletePage.validarIngresoExitoso();
+        await checkoutCompletePage.validarIngresoExitoso("Products");
       });
     },
   );
@@ -171,4 +172,36 @@ test.describe("Failure Tests", { tag: "@failure" }, () => {
       "The message has correct text",
     ).toContainText("Epic sadface: Sorry, this user has been locked out.");
   });
+  test("Falso positivo por usuario problem_user", async ({
+    loginPage,
+    inventoryPage,
+    }) => {
+    await loginPage.abrirPagina();
+    await loginPage.ingresar("problem_user");
+    await loginPage.validarIngresoExitoso("Products");
+    await loginPage.validarSnapshot();
+
+    await inventoryPage.agregarItemPorNombre("Sauce Labs Bike Light");
+    await inventoryPage.agregarPrimerItemAlCarrito();
+    await inventoryPage.validarItemsAgregadosAlCarrito(2);
+    await inventoryPage.abrirCarrito();
+  });
+  test(
+    "Simulate retry for flaky test",
+    { tag: "@flaky" },
+    async ({ loginPage }, testInfo) => {
+      // Abrir la página
+      await loginPage.abrirPagina();
+
+      await loginPage.ingresar("standard_user");
+      // Simulamos el error en el primer intento para que falle y se reintente
+      const retry = testInfo.retry;
+      let message: string = "Products";
+      if (retry === 0) {
+        console.log("Simulando error en el primer intento");
+        message = "Error Message";
+      }
+      await loginPage.validarIngresoExitoso(message);
+    },
+  );
 });
