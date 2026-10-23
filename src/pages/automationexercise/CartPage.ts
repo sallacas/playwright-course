@@ -4,10 +4,12 @@ import { BasePage } from "../BasePage";
 export class CartPage extends BasePage {
     readonly navigationBarTitle: Locator;
     readonly detailItems: Locator;
+    readonly checkoutButton: Locator;
     constructor(page: Page) {
         super(page);
         this.navigationBarTitle = this.page.getByText("Shopping Cart");
         this.detailItems = this.page.locator("#cart_info_table").locator("tbody tr");
+        this.checkoutButton = this.page.getByText('Proceed To Checkout');
     }
     async validarPaginaCarritoVisible(): Promise<void> {
         await expect(this.navigationBarTitle, "Expected Shopping Cart title is Visible").toBeVisible();
@@ -19,5 +21,8 @@ export class CartPage extends BasePage {
 
         await expect(actualQuantity.trim(), `Expected quantity in cart is ${quantity}`).toBe(`${quantity}`);
         await expect(actualPrice.trim(), `Expected price in cart is ${price}`).toBe(`${price}`);
+    }
+    async irAlCheckout(): Promise<void> {
+        await this.checkoutButton.click();
     }
 }

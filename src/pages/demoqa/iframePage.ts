@@ -2,7 +2,7 @@ import { expect, type FrameLocator, type Locator } from "@playwright/test";
 import { BasePage } from "../BasePage";
 
 export class iframePage extends BasePage {
-  async acceder(): Promise<void> {
+  async accederAutoPage(): Promise<void> {
     await this.abrirPagina("https://demoqa.com/frames");
   }
 

@@ -25,4 +25,19 @@ export class BasePage {
   async abrirPagina(url: string): Promise<void> {
     await this.page.goto(url);
   }
+  async accederAutoPage(): Promise<void> {
+    await this.abrirPagina("https://automationexercise.com");
+  }
+  async validarAccesoAutoPageCorrecto(): Promise<void> {
+    await expect(this.page).toHaveURL("https://automationexercise.com/");
+    await expect(this.page.getByRole('img', { name: 'Website for automation practice' })).toBeVisible();
+  }
+  async validarDeleteAccountVisible(): Promise<void> {
+    const deleteAccountLink = this.page.getByRole("link", { name: " Delete Account" });
+    await expect(deleteAccountLink, "Expected Delete Account link is Visible").toBeVisible();
+  }
+  async irAlCarrito(): Promise<void> {
+    const viewCartButton = this.page.getByRole("link", { name: "View Cart" });
+    await viewCartButton.click();
+  }
 }
